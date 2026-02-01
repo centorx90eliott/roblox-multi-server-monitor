@@ -7,7 +7,8 @@ app.use(express.json());
 const servers = new Map(); // serverId → { lastSeen: Date, cameras: Map<cameraId, data> }
 
 app.post('/report', (req, res) => {
-    const { serverId, cameraId, cframe, fov, visiblePlayers } = req.body;
+    const { serverId, cameraId, cframe, fov, frames } = req.body;
+
 
     if (!serverId || !cameraId) {
         return res.status(400).json({ error: "serverId et cameraId obligatoires" });
@@ -20,11 +21,12 @@ app.post('/report', (req, res) => {
     const serverData = servers.get(serverId);
     serverData.lastSeen = new Date();
     serverData.cameras.set(cameraId, {
-        cframe: cframe, // {x,y,z, lookAtX,lookAtY,lookAtZ} ou string JSON
-        fov: fov || 70,
-        visiblePlayers: visiblePlayers || [],
+        cframe,
+        fov,
+        frames: frames || [],
         timestamp: Date.now()
     });
+
 
     res.json({ status: "ok" });
 });
